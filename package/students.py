@@ -10,7 +10,7 @@ def display_students(flag):
     print("--------------------------------------")
     for student in student_list:
         print(student)
-    if (flag == 0)
+    if (flag == 0):
         input("\nPress ENTER to continue...")
 
 
@@ -36,15 +36,15 @@ def add_student():
                 return
         while True:
             student_name = input("Enter the student's name: ")
-            if (student_name.isalpha() == False):
+            if (all(char.isalpha() or char.isspace() for char in student_name)):
+                break
+            else:
                 print("Error. Student name must be contain alphabets only.")
                 retry = input("Try again? (Y/N): ")
                 if (retry.upper() == "Y"):
                     continue
                 else:
                     return
-            else:
-                break
         student_email = input("Enter student's email: ")
         new_student = Student(student_id, student_name, student_email)
         student_list.append(new_student)
@@ -58,18 +58,6 @@ def add_student():
             return
 
 
-def remove_student():
-    print("\n--------------------------------------")
-    print("          Remove a Student           ")
-    print("--------------------------------------")
-    display_students(1)
-    student_id = input("Enter Student ID to remove: ")
-    for i in range(len(student_list) - 1, -1, -1):
-        if (student_list[i].student_id == student_id):
-            student_list.pop(i)
-
-
-
 def manage_students():
     go_back = False
 
@@ -79,11 +67,10 @@ def manage_students():
         print("--------------------------------------")
         print("""[1] Display student list
 [2] Add a student
-[3] Remove a student
-[4] Record marks
-[5] Display student performance
-[6] Export student performance
-[7] Go back""")
+[3] Record marks
+[4] Display student performance
+[5] Export student performance
+[6] Go back""")
 
         # Input from user
         option = input("\nPlease select [1-7]: ")
@@ -94,14 +81,12 @@ def manage_students():
             case "2":
                 add_student()
             case "3":
-                remove_student()
-            case "4":
                 record_marks()
-            case "5":
+            case "4":
                 display_student_performance()
-            case "6":
+            case "5":
                 export_student_performance()
-            case "7":
+            case "6":
                 go_back = True
             case _:
                 print("\nError. Input is not a number 1-6. Please try again.")
