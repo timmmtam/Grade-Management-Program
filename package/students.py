@@ -11,6 +11,45 @@ def display_students():
         print(student)
     input("\nPress ENTER to continue...")
 
+
+def add_student():
+    print("\n--------------------------------------")
+    print("            Add a Student             ")
+    print("--------------------------------------")
+    while True:
+        student_id = int(input("Enter a new Student ID: "))
+        for student in student_list:
+            if (student_id.isdigit() == False):
+                print("Error. Student ID must contain numbers only.")
+                retry = input("Try again? (Y/N): ")
+                if (retry.upper() == "Y"):
+                    continue
+                else:
+                    return
+            if (student_id == student.student_id):
+                print("Error. Student already exists.")
+                return
+        student_name = input("Enter the student's name: ")
+        if (student_name.isalpha() == False):
+            print("Error. Student name must be contain alphabets only.")
+            retry = input("Try again? (Y/N): ")
+            if (retry.upper() == "Y"):
+                continue
+            else:
+                return
+        student_email = input("Enter student's email: ")
+        new_student = Student(student_id, student_name, student_email)
+        student_list.append(new_student)
+        with open("students.txt", "a") as f:
+            f.write(f"{student_id, student_name, student_email}")
+        print(f"Complete! Student {student_name}({student_id}) has been successfully added to the system.")
+        retry = input("Do you want to add another student? (Y/N): ")
+        if (retry.upper() == "Y"):
+            continue
+        else:
+            return
+        
+
 def manage_students():
     go_back = False
 
