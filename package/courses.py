@@ -29,7 +29,7 @@ def add_course():
         course_list.append(new_course)
         with open("courses.txt", "a") as f:
             f.write(f"{course_id},{course_name}\n")
-        print(f"Complete! Course {course_name}({course_id}) has been successfully added to the system.")
+        print(f"Success! {course_name}({course_id}) has been added.")
         retry = input("Do you want to add another course? (Y/N): ")
         if (retry.upper() == "Y"):
             continue
