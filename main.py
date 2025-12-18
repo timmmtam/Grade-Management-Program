@@ -12,7 +12,7 @@ def load_data():
         print("Retrieving data from students.txt...")
         with open("students.txt", "r") as f:
             for line in f:
-                section = line.split(",")
+                section = line.strip().split(",")
                 student_list.append(Student(section[0], section[1],
                                             section[2]))
         print(f"{len(student_list)} student(s) found.")
@@ -25,7 +25,7 @@ def load_data():
         print("Retrieving data from courses.txt...")
         with open("courses.txt", "r") as f:
             for line in f:
-                section = line.split(",")
+                section = line.strip().split(",")
                 course_list.append(Course(section[0], section[1]))
         print(f"{len(course_list)} course(s) found.")
     except FileNotFoundError:
@@ -36,15 +36,20 @@ def load_data():
     try:
         print("Assigning data from grades.txt...")
         with open("grades.txt", "r") as f:
-            for line in f:
-                section = line.split(",")
+            lines = f.readlines()
+            for line in lines:
+                section = line.strip().split(",")
                 for student in student_list:
                     if (student.student_id == section[0]):
                         for course in course_list:
                             if (course.course_id == section[1]):
-                                student.enrolled_courses[course.course_id] = {
-                                        "mark": section[2],
-                                        "grade": section[3]}
+                                try:
+                                    student.enrolled_courses[course.course_id] = {
+                                            "mark": section[2],
+                                            "grade": section[3],
+                                            "gpa": section[4]}
+                                except IndexError:
+                                    student.enrolled_courses[course.course_id] = {}
     except FileNotFoundError:
         print("grades.txt not found. Creating grades.txt...")
         with open("grades.txt", "a") as f:

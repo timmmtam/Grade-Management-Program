@@ -37,6 +37,74 @@ def add_course():
             return
 
 
+def display_course_performance():
+    print("\n--------------------------------------")
+    print("      Display Course Performance      ")
+    print("--------------------------------------")
+    course_id = input("\nEnter Course ID to display summary for: ")
+
+    students_in_course = []
+    marks = []
+
+    for student in student_list:
+        if course_id in student.enrolled_courses:
+            students_in_course.append(student)
+            marks.append(float(student.enrolled_courses[course_id]["mark"]))
+
+    if len(marks) == 0:
+        print(f"\nNo students found enrolled in {course_id}.")
+        input("\nPress ENTER to continue...")
+        return
+
+    average_mark = sum(marks) / len(marks)
+    lowest_mark = min(marks)
+    highest_mark = max(marks)
+
+    print(f"\nStudents in {course_id}:")
+    print("---------------------------------")
+    for student in students_in_course:
+        info = student.enrolled_courses[course_id]
+        print(f"{student.name} ({student.student_id}) - Mark: {info['mark']}")
+
+    print(f"\nPerformance summary for {course_id}:")
+    print("---------------------------------")
+    print(f"Average mark: {average_mark:.2f}")
+    print(f"Lowest mark:  {lowest_mark}")
+    print(f"Highest mark: {highest_mark}")
+
+    input("\nPress ENTER to continue...")
+
+
+def export_course_performance():
+    print("\n--------------------------------------")
+    print("       Export Course Performance      ")
+    print("--------------------------------------")
+    course_id = input("Enter Course ID: ")
+    if (course_id not in course_list):
+        print("\nError. Course does not exist.")
+        input("\nPress ENTER to continue...")
+        return
+
+    report_title = input("Enter report title: ").strip()
+    if not report_title:
+        print("Report title is required.\n")
+        return
+
+    report_filename = f"{report_title.replace(' ', '_')}.txt"
+
+    with open(report_filename, "w") as report:
+        report.write(f"{report_title}\n\n")
+        report.write(f"Course ID: {course_id}\n")
+
+        with open("grades.txt", "r") as f:
+            for line in f:
+                data = line.strip().split(",")
+                if data[1] == course_id:
+                    report.write(f"Student ID: {data[0]} Marks: {data[2]}, Grade: {data[3]}\n")
+
+    print(f"Course report saved as {report_filename}\n")
+
+
 def manage_courses():
     go_back = False
 
