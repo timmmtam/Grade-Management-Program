@@ -1,6 +1,17 @@
 # Module for managing courses
 from .config import student_list, course_list
 from .classes import Course
+from .utils import grade_calculation, courses_available, students_available
+
+
+def display_course():
+    # Display the list of courses
+    print("\n--------------------------------------")
+    print("             Courses List             ")
+    print("--------------------------------------")
+    for course in course_list:
+        print(course)
+    input("\nPress ENTER to return...")
 
 
 def add_course():
@@ -12,7 +23,8 @@ def add_course():
         course_id.upper()
         for course in course_list:
             if (course_id == course.course_id):
-                print("Error. Course already exists.")
+                print("\nError. Course already exists.")
+                input("\nPress ENTER to return...")
                 return
         while True:
             course_name = input("Enter the course's name: ")
@@ -38,9 +50,22 @@ def add_course():
 
 
 def display_course_performance():
+    if (students_available(student_list) is False):
+        print("\nError: No data of students available!")
+        input("\nPress ENTER to return...")
+        return
+
+    if (courses_available(course_list) is False):
+        print("\nError: No data of courses available!")
+        input("\nPress ENTER to return...")
+        return
+
     print("\n--------------------------------------")
     print("      Display Course Performance      ")
     print("--------------------------------------")
+    print("\nCourse list\n---------------------")
+    for course in course_list:
+        print(course)
     course_id = input("\nEnter Course ID to display summary for: ")
 
     students_in_course = []
@@ -49,11 +74,16 @@ def display_course_performance():
     for student in student_list:
         if course_id in student.enrolled_courses:
             students_in_course.append(student)
-            marks.append(float(student.enrolled_courses[course_id]["mark"]))
+            try:
+                marks.append(float(student.enrolled_courses[course_id]["mark"]))
+            except KeyError:
+                print(f"\nError. Data for {course_id} not complete.")
+                input("\nPress ENTER to return...")
+                return
 
     if len(marks) == 0:
         print(f"\nNo students found enrolled in {course_id}.")
-        input("\nPress ENTER to continue...")
+        input("\nPress ENTER to return...")
         return
 
     average_mark = sum(marks) / len(marks)
@@ -72,37 +102,75 @@ def display_course_performance():
     print(f"Lowest mark:  {lowest_mark}")
     print(f"Highest mark: {highest_mark}")
 
-    input("\nPress ENTER to continue...")
+    input("\nPress ENTER to return...")
 
 
 def export_course_performance():
+    if (students_available(student_list) is False):
+        print("\nError: No data of students available!")
+        input("\nPress ENTER to return...")
+        return
+
+    if (courses_available(course_list) is False):
+        print("\nError: No data of courses available!")
+        input("\nPress ENTER to return...")
+        return
+
     print("\n--------------------------------------")
     print("       Export Course Performance      ")
     print("--------------------------------------")
-    course_id = input("Enter Course ID: ")
-    if (course_id not in course_list):
+    print("\nCourse list\n---------------------")
+    for course in course_list:
+        print(course)
+
+    course_id = input("\nEnter Course ID to export: ")
+    if (course_id not in (course.course_id for course in course_list)):
         print("\nError. Course does not exist.")
-        input("\nPress ENTER to continue...")
+        input("\nPress ENTER to return...")
         return
 
-    report_title = input("Enter report title: ").strip()
-    if not report_title:
-        print("Report title is required.\n")
+    students_in_course = []
+    marks = []
+
+    for student in student_list:
+        if course_id in student.enrolled_courses:
+            students_in_course.append(student)
+            try:
+                marks.append(float(student.enrolled_courses[course_id]["mark"]))
+            except KeyError:
+                print(f"\nError. Data for {course_id} not complete.")
+                input("\nPress ENTER to return...")
+                return
+
+    if len(marks) == 0:
+        print(f"\nNo students found enrolled in {course_id}.")
+        input("\nPress ENTER to return...")
         return
+
+    average_mark = sum(marks) / len(marks)
+    lowest_mark = min(marks)
+    highest_mark = max(marks)
+
+    report_title = f"{course_id} Course Performance Summary"
 
     report_filename = f"{report_title.replace(' ', '_')}.txt"
 
     with open(report_filename, "w") as report:
         report.write(f"{report_title}\n\n")
-        report.write(f"Course ID: {course_id}\n")
 
         with open("grades.txt", "r") as f:
             for line in f:
                 data = line.strip().split(",")
                 if data[1] == course_id:
                     report.write(f"Student ID: {data[0]} Marks: {data[2]}, Grade: {data[3]}\n")
+            report.write(f"\nCourse Performance Summary\n")
+            report.write(f"-----------------------------\n")
+            report.write(f"Lowest Mark: {lowest_mark}\n")
+            report.write(f"Highest Mark: {highest_mark}\n")
+            report.write(f"Marks Average: {average_mark}")
 
-    print(f"Course report saved as {report_filename}\n")
+    print(f"Course report saved as {report_filename}")
+    input("\nPress ENTER to continue...")
 
 
 def manage_courses():
@@ -112,22 +180,25 @@ def manage_courses():
         print("\n--------------------------------------")
         print("           Managing Courses           ")
         print("--------------------------------------")
-        print("""[1] Add a course
-[2] Display course performance summary
-[3] Export course performance summary
-[4] Go back""")
+        print("""[1] Display courses
+[2] Add a course
+[3] Display course performance summary
+[4] Export course performance summary
+[5] Go back""")
 
         # Input from user
         option = input("\nPlease select [1-5]: ")
 
         match option:
             case "1":
-                add_course()
+                display_course()
             case "2":
-                display_course_performance()
+                add_course()
             case "3":
-                export_course_performance()
+                display_course_performance()
             case "4":
+                export_course_performance()
+            case "5":
                 go_back = True
             case _:
                 print("\nError. Input is not a number 1-4. Please try again.")

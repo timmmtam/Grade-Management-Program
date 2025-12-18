@@ -20,3 +20,19 @@ def grade_calculation(mark):
         return "D", "2.00"
     else:
         return "F", "1.50"
+
+
+def students_available(student_list):
+    # Check data of students availability
+    if len(student_list) == 0:
+        return False
+    else:
+        return True
+
+
+def courses_available(course_list):
+    # Check data of courses availability
+    if len(course_list) == 0:
+        return False
+    else:
+        return True

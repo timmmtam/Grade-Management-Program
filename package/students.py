@@ -1,18 +1,17 @@
 #  Module for managing students
 from .config import student_list, course_list
 from .classes import Student
-from .utils import grade_calculation
+from .utils import grade_calculation, courses_available, students_available
 
 
-def display_students(flag):
+def display_students():
     # Display the list of students with their student_id
     print("\n--------------------------------------")
     print("             Student List             ")
     print("--------------------------------------")
     for student in student_list:
         print(student)
-    if (flag == 0):
-        input("\nPress ENTER to continue...")
+    input("\nPress ENTER to return...")
 
 
 def add_student():
@@ -22,7 +21,7 @@ def add_student():
     while True:
         while True:
             student_id = input("Enter a new Student ID: ")
-            if (student_id.isdigit() is False):
+            if (student_id.isdigit() is False or not student_id):
                 print("Error. Student ID must contain numbers only.")
                 retry = input("Try again? (Y/N): ")
                 if (retry.upper() == "Y"):
@@ -34,6 +33,7 @@ def add_student():
         for student in student_list:
             if (student_id == student.student_id):
                 print("Error. Student already exists.")
+                input("Press ENTER to return...")
                 return
         while True:
             student_name = input("Enter the student's name: ")
@@ -72,6 +72,16 @@ def add_student():
 
 
 def enroll_student():
+    if (students_available(student_list) is False):
+        print("\nError: No data of students available!")
+        input("\nPress ENTER to return...")
+        return
+
+    if (courses_available(course_list) is False):
+        print("\nError: No data of courses available!")
+        input("\nPress ENTER to return...")
+        return
+
     print("\n--------------------------------------")
     print("           Enroll a Student           ")
     print("--------------------------------------")
@@ -83,7 +93,7 @@ def enroll_student():
         student_id = input("\nSelect the Student ID to enroll into a course: ")
         if (student_id not in (stu.student_id for stu in student_list)):
             print("\nError. Student does not exist.")
-            input("\nPress ENTER to continue...")
+            input("\nPress ENTER to return...")
             return
 
         print("\nCourse list\n---------------------")
@@ -93,7 +103,7 @@ def enroll_student():
         course_id = input("\nSelect the Course ID to enroll the student in: ")
         if (course_id not in (course.course_id for course in course_list)):
             print("\nError. Course does not exist.")
-            input("\nPress ENTER to continue...")
+            input("\nPress ENTER to return...")
             return
         for student in student_list:
             if (student_id == student.student_id):
@@ -101,7 +111,7 @@ def enroll_student():
                     if (key == course_id):
                         print("\nError.")
                         print("Student is already enrolled in this course.")
-                        input("\nPress ENTER to continue...")
+                        input("\nPress ENTER to return...")
                         return
                 student.enrolled_courses[f"{course_id}"] = {}
                 with open("grades.txt", "a") as f:
@@ -116,6 +126,16 @@ def enroll_student():
 
 
 def record_marks():
+    if (students_available(student_list) is False):
+        print("\nError: No data of students available!")
+        input("\nPress ENTER to return...")
+        return
+
+    if (courses_available(course_list) is False):
+        print("\nError: No data of courses available!")
+        input("\nPress ENTER to return...")
+        return
+
     print("\n--------------------------------------")
     print("         Record Student Marks         ")
     print("--------------------------------------")
@@ -128,8 +148,8 @@ def record_marks():
         student_id = input("Input Student ID to record marks: ")
         if student_id not in (student.student_id for student in student_list):
             print("\nError. Student does not exist.")
-            input("\nPress ENTER... to continue")
-            continue
+            input("\nPress ENTER... to return")
+            return
 
         print(f"\nEnrolled courses for {student_id}")
         print("------------------------------------")
@@ -153,6 +173,10 @@ def record_marks():
                         continue
                     else:
                         return
+            if ((marks < 0) or (marks > 100)):
+                    print("\nError. Marks must be in range 0 - 100.")
+                    input("\nPress ENTER to retry...")
+                    continue
             grade, gpa = grade_calculation(marks)
             marks = str(marks)
             for student in student_list:
@@ -179,6 +203,8 @@ def record_marks():
             print(f"{student_id} has been graded {grade} in {course_id}.")
         else:
             print("\nError. Student in not enrolled in this course.")
+            input("\nPress ENTER to retry...")
+            continue
         retry = input("\nRecord marks again? (Y/N): ")
         if (retry.upper() == "Y"):
             continue
@@ -187,17 +213,15 @@ def record_marks():
 
 
 def display_student_performance():
-    # Check data of students availability
-    if len(student_list) == 0:
-        print("Error: No data of students available!")
-        input("Press ENTER to continue...")
-        return # return back to module for managing students
-    
-    # Check data of courses availability
-    if len(course_list) == 0:
-        print("Error: No data of courses available!")
-        input("Press ENTER to continue...")
-        return # return back to module for managing students
+    if (students_available(student_list) is False):
+        print("\nError: No data of students available!")
+        input("\nPress ENTER to return...")
+        return
+
+    if (courses_available(course_list) is False):
+        print("\nError: No data of courses available!")
+        input("\nPress ENTER to return...")
+        return
 
     while True:
         print("\n--------------------------------------")
@@ -207,44 +231,101 @@ def display_student_performance():
         for student in student_list:
             print(student)
         print()
-        check_student_id = input("\nEnter Student ID to display performance: ")
+        student_id = input("\nEnter Student ID to display performance: ")
 
         found = False
         for student in student_list:
-            # The student id inputed exist in the list of student id
-            if student.student_id == check_student_id: 
+            if student.student_id == student_id:
                 found = True
                 print(f"\nStudent: {student.name} ({student.student_id})")
                 print(f"Email:{student.email}")
                 print("-" * 50)
 
-                # Table header with :<12 mean left-justified width of 12 characters
                 print(f"{'Course ID':<12} {'Mark':<8}{'Grade':<8}{'GPA':<6}")
 
-                # Loop through each enrolled course for the specific student
                 for course_id, data in student.enrolled_courses.items():
-                    mark = data.get("mark", "0") # Get the mark's data, safely return 0 when not have mark's data
-                    grade = data.get("grade", "N/A") # Get the grade's data, safely return Not Recorded when not have grade's data
-                    gpa = data.get("gpa", "0.00") # Get the GPA's data, safely return 0.00 when not have GPA's data
-                    print(f"{course_id:<12}{mark:<8}{grade:<8}{gpa:<6}") # :<12 mean left-justified width of 12 characters and .1f mean one decimal place
+                    mark = data.get("mark", "0")
+                    grade = data.get("grade", "N/A")
+                    gpa = data.get("gpa", "0.00")
+                    print(f"{course_id:<12}{mark:<8}{grade:<8}{gpa:<6}")
 
-                # Show CGPA
                 CGPA = student.calculate_cgpa()
                 print("-" * 50)
-                print(f"CGPA: {CGPA:.2f}") # :.2f mean 2 decimal places
+                print(f"CGPA: {CGPA:.2f}")
                 print("-" * 50)
 
-        # The student id inputed not exist in the list of student id    
         if found == False:
-            print(f"Error: Student ID ({check_student_id}) not found. Please try again.")
-            continue # Skip rest of the code and start back from the while True loop
+            print(f"Error: Student ID ({check_student_id}) not found.")
+            input(f"Press ENTER to return...")
+            return
 
-        # Ask if user wants to check another student
         retry = input("\nDisplay student performance again? (Y/N): ")
-        if retry == "Y":
-            continue # Exit while True loop of choice and go back to while True loop of check_student_id
+        if retry.upper() == "Y":
+            continue
         else:
             break
+
+
+def export_student_performance():
+    if (students_available(student_list) is False):
+        print("\nError: No data of students available!")
+        input("\nPress ENTER to return...")
+        return
+
+    if (courses_available(course_list) is False):
+        print("\nError: No data of courses available!")
+        input("\nPress ENTER to return...")
+        return
+
+    print("\n--------------------------------------")
+    print("      Export Student Performance      ")
+    print("--------------------------------------")
+    print("\nStudent list\n---------------------")
+    for student in student_list:
+        print(student)
+
+    student_id = input("\nEnter Student ID to export: ")
+    if (student_id not in (student.student_id for student in student_list)):
+        print("\nError. Student does not exist.")
+        input("\nPress ENTER to return...")
+        return
+
+    report_title = f"{student_id} Performance Summary"
+
+    report_filename = f"{report_title.replace(' ', '_')}.txt"
+
+    with open(report_filename, "w") as report:
+        report.write(f"{report_title}\n\n")
+
+        with open("grades.txt", "r") as f:
+            found = False
+            for student in student_list:
+                if student.student_id == student_id:
+                    found = True
+                    report.write(f"Student: {student.name} ({student.student_id})\n")
+                    report.write(f"Email:{student.email}\n")
+                    report.write("-" * 50 + "\n")
+
+                    report.write(f"{'Course ID':<12} {'Mark':<8}{'Grade':<8}{'GPA':<6}\n")
+
+                    for course_id, data in student.enrolled_courses.items():
+                        mark = data.get("mark", "0")
+                        grade = data.get("grade", "N/A")
+                        gpa = data.get("gpa", "0.00")
+                        report.write(f"{course_id:<12}{mark:<8}{grade:<8}{gpa:<6}\n")
+
+                    CGPA = student.calculate_cgpa()
+                    report.write("-" * 50 + "\n")
+                    report.write(f"CGPA: {CGPA:.2f}\n")
+                    report.write("-" * 50 + "\n")
+
+            if found == False:
+                print(f"Error: Student ID ({check_student_id}) not found.")
+                input(f"Press ENTER to return...")
+                return
+
+    print(f"Student report saved as {report_filename}")
+    input("\nPress ENTER to continue...")
 
 
 def manage_students():
@@ -267,7 +348,7 @@ def manage_students():
 
         match option:
             case "1":
-                display_students(0)
+                display_students()
             case "2":
                 add_student()
             case "3":
