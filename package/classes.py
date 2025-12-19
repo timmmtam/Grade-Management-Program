@@ -13,19 +13,19 @@ class Student:
         self.enrolled_courses = {}
 
     def calculate_cgpa(self):
-        if len(self.enrolled_courses) == 0: # Check the student has enrolled any courses or not
-            return 0.00 # If not enrolled any courses, then cgpa is 0.00
+        if len(self.enrolled_courses) == 0:
+            return 0.00
 
         total_GPA = 0
         count = 0
 
         # Loop through each course dictionary
-        for course_id, data in self.enrolled_courses.items():  
-            gpa = data.get("gpa", "0.00") # Get the GPA's data, safely return 0.00 when not have GPA's data
+        for course_id, data in self.enrolled_courses.items():
+            gpa = data.get("gpa", "0.00")
             total_GPA += float(gpa)
-            count += 1 
+            count += 1
 
-        return round(total_GPA / count, 2)  # Return CGPA rounded to 2 decimal places
+        return round(total_GPA / count, 2)
 
     def __str__(self):
         return f"{self.name} ({self.student_id})"
