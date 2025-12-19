@@ -101,6 +101,7 @@ def enroll_student():
             print(course)
 
         course_id = input("\nSelect the Course ID to enroll the student in: ")
+        course_id = course_id.upper()
         if (course_id not in (course.course_id for course in course_list)):
             print("\nError. Course does not exist.")
             input("\nPress ENTER to return...")
@@ -160,6 +161,7 @@ def record_marks():
 
         enrolled = False
         course_id = input("\nInput Course ID to record marks for: ")
+        course_id = course_id.upper()
         for student in student_list:
             if (student_id == student.student_id):
                 if course_id in student.enrolled_courses:

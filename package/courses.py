@@ -21,6 +21,10 @@ def add_course():
     while True:
         course_id = input("Enter a new Course ID: ")
         course_id = course_id.upper()
+        if (len(course_id) > 8 or not course_id):
+            print("\nError. Course ID must be 1-8 characters long.")
+            input("\nPress ENTER to return...")
+            return
         for course in course_list:
             if (course_id == course.course_id):
                 print("\nError. Course already exists.")
@@ -67,6 +71,7 @@ def display_course_performance():
     for course in course_list:
         print(course)
     course_id = input("\nEnter Course ID to display summary for: ")
+    course_id = course_id.upper()
 
     students_in_course = []
     marks = []
@@ -77,7 +82,7 @@ def display_course_performance():
             try:
                 marks.append(float(student.enrolled_courses[course_id]["mark"]))
             except KeyError:
-                print(f"\nError. Data for {course_id} not complete.")
+                print(f"\nError. Data for {student.name} is not complete.")
                 input("\nPress ENTER to return...")
                 return
 
@@ -124,6 +129,7 @@ def export_course_performance():
         print(course)
 
     course_id = input("\nEnter Course ID to export: ")
+    course_id = course_id.upper()
     if (course_id not in (course.course_id for course in course_list)):
         print("\nError. Course does not exist.")
         input("\nPress ENTER to return...")
@@ -138,7 +144,7 @@ def export_course_performance():
             try:
                 marks.append(float(student.enrolled_courses[course_id]["mark"]))
             except KeyError:
-                print(f"\nError. Data for {course_id} not complete.")
+                print(f"\nError. Data for {student.name} not complete.")
                 input("\nPress ENTER to return...")
                 return
 
