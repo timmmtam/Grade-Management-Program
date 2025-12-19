@@ -1,7 +1,7 @@
 # Module for managing courses
 from .config import student_list, course_list
 from .classes import Course
-from .utils import grade_calculation, courses_available, students_available
+from .utils import courses_available, students_available
 
 
 def display_course():
@@ -20,7 +20,7 @@ def add_course():
     print("--------------------------------------")
     while True:
         course_id = input("Enter a new Course ID: ")
-        course_id.upper()
+        course_id = course_id.upper()
         for course in course_list:
             if (course_id == course.course_id):
                 print("\nError. Course already exists.")
@@ -161,10 +161,16 @@ def export_course_performance():
         with open("grades.txt", "r") as f:
             for line in f:
                 data = line.strip().split(",")
-                if data[1] == course_id:
-                    report.write(f"Student ID: {data[0]} Marks: {data[2]}, Grade: {data[3]}\n")
-            report.write(f"\nCourse Performance Summary\n")
-            report.write(f"-----------------------------\n")
+                if (len(data) > 3):
+                    if data[1] == course_id:
+                        report.write(f"Student ID: {data[0]} Marks: {data[2]}")
+                        report.write(f", Grade: {data[3]}\n")
+                else:
+                    print("\nError. Data is incomplete")
+                    input("\nPress ENTER to return...")
+                    return
+            report.write("\nCourse Performance Summary\n")
+            report.write("-----------------------------\n")
             report.write(f"Lowest Mark: {lowest_mark}\n")
             report.write(f"Highest Mark: {highest_mark}\n")
             report.write(f"Marks Average: {average_mark}")
@@ -201,5 +207,5 @@ def manage_courses():
             case "5":
                 go_back = True
             case _:
-                print("\nError. Input is not a number 1-4. Please try again.")
+                print("\nError. Input is not a number 1-5. Please try again.")
                 input("Press ENTER to continue...")

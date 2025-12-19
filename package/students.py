@@ -148,7 +148,7 @@ def record_marks():
         student_id = input("Input Student ID to record marks: ")
         if student_id not in (student.student_id for student in student_list):
             print("\nError. Student does not exist.")
-            input("\nPress ENTER... to return")
+            input("\nPress ENTER to return...")
             return
 
         print(f"\nEnrolled courses for {student_id}")
@@ -158,8 +158,12 @@ def record_marks():
                 for key in student.enrolled_courses:
                     print(f"{key}")
 
+        enrolled = False
         course_id = input("\nInput Course ID to record marks for: ")
-        enrolled = any(course_id in s.enrolled_courses for s in student_list)
+        for student in student_list:
+            if (student_id == student.student_id):
+                if course_id in student.enrolled_courses:
+                    enrolled = True
         if (enrolled):
             while (True):
                 marks = input(f"Enter marks for {student_id} in {course_id}: ")
@@ -174,9 +178,9 @@ def record_marks():
                     else:
                         return
             if ((marks < 0) or (marks > 100)):
-                    print("\nError. Marks must be in range 0 - 100.")
-                    input("\nPress ENTER to retry...")
-                    continue
+                print("\nError. Marks must be in range 0 - 100.")
+                input("\nPress ENTER to retry...")
+                continue
             grade, gpa = grade_calculation(marks)
             marks = str(marks)
             for student in student_list:
@@ -254,9 +258,9 @@ def display_student_performance():
                 print(f"CGPA: {CGPA:.2f}")
                 print("-" * 50)
 
-        if found == False:
-            print(f"Error: Student ID ({check_student_id}) not found.")
-            input(f"Press ENTER to return...")
+        if found is False:
+            print(f"Error: Student ID ({student_id}) not found.")
+            input("Press ENTER to return...")
             return
 
         retry = input("\nDisplay student performance again? (Y/N): ")
@@ -297,32 +301,31 @@ def export_student_performance():
     with open(report_filename, "w") as report:
         report.write(f"{report_title}\n\n")
 
-        with open("grades.txt", "r") as f:
-            found = False
-            for student in student_list:
-                if student.student_id == student_id:
-                    found = True
-                    report.write(f"Student: {student.name} ({student.student_id})\n")
-                    report.write(f"Email:{student.email}\n")
-                    report.write("-" * 50 + "\n")
+        found = False
+        for student in student_list:
+            if student.student_id == student_id:
+                found = True
+                report.write(f"Student: {student.name} ({student.student_id})\n")
+                report.write(f"Email:{student.email}\n")
+                report.write("-" * 50 + "\n")
 
-                    report.write(f"{'Course ID':<12} {'Mark':<8}{'Grade':<8}{'GPA':<6}\n")
+                report.write(f"{'Course ID':<12} {'Mark':<8}{'Grade':<8}{'GPA':<6}\n")
 
-                    for course_id, data in student.enrolled_courses.items():
-                        mark = data.get("mark", "0")
-                        grade = data.get("grade", "N/A")
-                        gpa = data.get("gpa", "0.00")
-                        report.write(f"{course_id:<12}{mark:<8}{grade:<8}{gpa:<6}\n")
+                for course_id, data in student.enrolled_courses.items():
+                    mark = data.get("mark", "0")
+                    grade = data.get("grade", "N/A")
+                    gpa = data.get("gpa", "0.00")
+                    report.write(f"{course_id:<12}{mark:<8}{grade:<8}{gpa:<6}\n")
 
-                    CGPA = student.calculate_cgpa()
-                    report.write("-" * 50 + "\n")
-                    report.write(f"CGPA: {CGPA:.2f}\n")
-                    report.write("-" * 50 + "\n")
+                CGPA = student.calculate_cgpa()
+                report.write("-" * 50 + "\n")
+                report.write(f"CGPA: {CGPA:.2f}\n")
+                report.write("-" * 50 + "\n")
 
-            if found == False:
-                print(f"Error: Student ID ({check_student_id}) not found.")
-                input(f"Press ENTER to return...")
-                return
+        if found is False:
+            print(f"Error: Student ID ({student_id}) not found.")
+            input("Press ENTER to return...")
+            return
 
     print(f"Student report saved as {report_filename}")
     input("\nPress ENTER to continue...")
